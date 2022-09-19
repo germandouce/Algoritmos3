@@ -96,7 +96,7 @@ usarHacha
 	dañoAInfligir := 10*pv.! !
 
 
-!CombatienteHumanoArthas class methodsFor: '--** private fileout/in **--' stamp: 'MP 9/18/2022 20:12:05'!
+!CombatienteHumanoArthas class methodsFor: '--** private fileout/in **--' stamp: 'MP 9/18/2022 21:32:08'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -212,7 +212,7 @@ usarHacha
 	dañoAInfligir := 10*pv.! !
 
 
-!CombatienteOrcoMankrik class methodsFor: '--** private fileout/in **--' stamp: 'MP 9/18/2022 20:12:05'!
+!CombatienteOrcoMankrik class methodsFor: '--** private fileout/in **--' stamp: 'MP 9/18/2022 21:32:08'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -333,7 +333,7 @@ usarHacha
 	dañoAInfligir := 10*pv.! !
 
 
-!CombatienteOrcoOlgra class methodsFor: '--** private fileout/in **--' stamp: 'MP 9/18/2022 20:12:05'!
+!CombatienteOrcoOlgra class methodsFor: '--** private fileout/in **--' stamp: 'MP 9/18/2022 21:32:08'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -891,7 +891,7 @@ noGanoNadie
 	^self determinarGanador = 'indeterminado'! !
 
 
-!OrquestadorDeCombates class methodsFor: '--** private fileout/in **--' stamp: 'MP 9/18/2022 20:12:05'!
+!OrquestadorDeCombates class methodsFor: '--** private fileout/in **--' stamp: 'MP 9/18/2022 21:32:08'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
