@@ -45,7 +45,7 @@ test02RemovingCustomerShouldNotTakeMoreThan100Milliseconds
 	self AssertPerforming: anActionBlock inLessThan: 	(100*millisecond).
 ! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'MP 9/24/2022 19:11:15'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'MP 9/25/2022 18:39:36'!
 test03CanNotAddACustomerWithEmptyName 
 
 	| customerBook anAction aResponse |
@@ -56,22 +56,9 @@ test03CanNotAddACustomerWithEmptyName
 			self assert: anError messageText = CustomerBook customerCanNotBeEmptyErrorMessage.
 			self assert: customerBook isEmpty ].
 
-	self AssertWhen: anAction returns: Error responseIs: aResponse. 
-	
-	"
-	| customerBook |
-			
-	customerBook := CustomerBook new.
+	self AssertWhen: anAction returns: Error responseIs: aResponse.! !
 
-	[ customerBook addCustomerNamed: ''.
-	self fail ]
-		on: Error 
-		do: [ :anError | 
-			self assert: anError messageText = CustomerBook customerCanNotBeEmptyErrorMessage.
-			self assert: customerBook isEmpty ]
-	"! !
-
-!CustomerBookTest methodsFor: 'testing' stamp: 'MP 9/24/2022 20:50:18'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'MP 9/25/2022 18:39:23'!
 test04CanNotRemoveAnInvalidCustomer
 	
 	| customerBook johnLennon aResponse anAction |
@@ -83,16 +70,7 @@ test04CanNotRemoveAnInvalidCustomer
 	anAction := [ customerBook removeCustomerNamed: 'Paul McCartney'. self fail ].
 	aResponse := [ :anError | self Assert: johnLennon isInA: customerBook with: 1].
 	
-	self AssertWhen: anAction returns: NotFound responseIs: aResponse.
-
-
-	"[ customerBook removeCustomerNamed: 'Paul McCartney'.
-	self fail ]
-		on: NotFound 
-		do: [ :anError | 
-			self assert: customerBook numberOfCustomers = 1.
-			self assert: (customerBook includesCustomerNamed: johnLennon) ]"
-! !
+	self AssertWhen: anAction returns: NotFound responseIs: aResponse.! !
 
 !CustomerBookTest methodsFor: 'testing' stamp: 'MP 9/24/2022 19:48:47'!
 test05SuspendingACustomerShouldNotRemoveItFromCustomerBook
@@ -163,24 +141,26 @@ test08CanNotSuspendAnAlreadySuspendedCustomer
 ! !
 
 
-!CustomerBookTest methodsFor: 'as yet unclassified' stamp: 'MP 9/24/2022 20:48:21'!
+!CustomerBookTest methodsFor: 'private assertions' stamp: 'MP 9/25/2022 18:40:33'!
 Assert: aCustomerName isIn: aCustomerBook with: aNumberOfCostumers 
+
 	self assert: aCustomerBook numberOfCustomers = aNumberOfCostumers.
 	self assert: (aCustomerBook includesCustomerNamed: aCustomerName )! !
 
-!CustomerBookTest methodsFor: 'as yet unclassified' stamp: 'MP 9/24/2022 20:50:26'!
+!CustomerBookTest methodsFor: 'private assertions' stamp: 'MP 9/25/2022 18:40:41'!
 Assert: aCustomerName isInA: aCustomerBook with: aNumberOfCostumers 
+
 	self assert: aCustomerBook numberOfCustomers = aNumberOfCostumers.
 	self assert: (aCustomerBook includesCustomerNamed: aCustomerName )! !
 
-!CustomerBookTest methodsFor: 'as yet unclassified' stamp: 'MP 9/24/2022 19:45:57'!
+!CustomerBookTest methodsFor: 'private assertions' stamp: 'MP 9/24/2022 19:45:57'!
 AssertIn: aCustomerBook aNumberOfActiveIs: aNumberOfActives andANumberOfSuspendedIs: aNumberOfSuspended.
 
 	self assert: aNumberOfActives equals: aCustomerBook numberOfActiveCustomers.
 	self assert: aNumberOfSuspended equals: aCustomerBook numberOfSuspendedCustomers.
 	self assert: (aNumberOfActives + aNumberOfSuspended) equals: aCustomerBook numberOfCustomers.! !
 
-!CustomerBookTest methodsFor: 'as yet unclassified' stamp: 'MP 9/24/2022 19:05:42'!
+!CustomerBookTest methodsFor: 'private assertions' stamp: 'MP 9/25/2022 18:38:50'!
 AssertPerforming: anAction inLessThan: aNumberOfMiliseconds
 	|millisecondsBeforeRunning millisecondsAfterRunning|
 	
@@ -188,12 +168,9 @@ AssertPerforming: anAction inLessThan: aNumberOfMiliseconds
 	anAction value.
 	millisecondsAfterRunning := Time millisecondClockValue * millisecond.
 
-	self assert: (millisecondsAfterRunning - millisecondsBeforeRunning) < (aNumberOfMiliseconds).
-	
-	
-	"Variables con el mismo nombre en diferentes entornos, si o no?"! !
+	self assert: (millisecondsAfterRunning - millisecondsBeforeRunning) < (aNumberOfMiliseconds).! !
 
-!CustomerBookTest methodsFor: 'as yet unclassified' stamp: 'MP 9/24/2022 19:15:49'!
+!CustomerBookTest methodsFor: 'private assertions' stamp: 'MP 9/24/2022 19:15:49'!
 AssertWhen: anAction returns: aTypeOfError responseIs: aResponse 
 
 	anAction on: aTypeOfError		do: aResponse.! !
@@ -225,11 +202,11 @@ initialize
 	suspended:= OrderedCollection new.! !
 
 
-!CustomerBook methodsFor: 'customer management' stamp: 'NR 4/3/2019 10:14:26'!
+!CustomerBook methodsFor: 'customer management' stamp: 'MP 9/25/2022 18:43:48'!
 addCustomerNamed: aName
 
 	aName isEmpty ifTrue: [ self signalCustomerNameCannotBeEmpty ].
-	((active includes: aName) or: [suspended includes: aName]) ifTrue: [ self signalCustomerAlreadyExists ].
+	(self includesCustomerNamed: aName) ifTrue: [ self signalCustomerAlreadyExists ].
 	
 	active add: aName ! !
 
@@ -248,8 +225,9 @@ numberOfSuspendedCustomers
 	
 	^suspended size! !
 
-!CustomerBook methodsFor: 'customer management' stamp: 'MP 9/24/2022 20:33:43'!
+!CustomerBook methodsFor: 'customer management' stamp: 'MP 9/25/2022 18:41:01'!
 removeCustomerNamed: aName 
+
 	^active remove: aName ifAbsent: [
 		suspended remove: aName ifAbsent: [
 			NotFound signal]].! !
