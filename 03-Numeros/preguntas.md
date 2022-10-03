@@ -13,4 +13,4 @@ Los metodos que no colaboraban con otros objetos porque corresponden al comporta
 Esto nos permite delegar la responsabilidad de el como implementarlo a sus hijos, ya que el "que se hace" es el mismo pero varía el "como hacerlo".
 
 ### No rompas. ¿Por qué está mal/qué problemas trae romper encapsulamiento?
-El romper encapsulamiento no nos favorece, ya que trae como consecuencia un aumento en el acoplamiento de los objetos. Esto último no es bueno ya que si una clase 'A' conocee el funcionamiento interno de otra clase 'B' y esta última cambia, la clase A probablemente se verá obligada cambiar, aumentando la complejidad de la lógia del programa y la posibilidad de que se produzcan errores en tiempo de ejecución.
+El romper encapsulamiento no nos favorece, ya que trae como consecuencia un aumento en el acoplamiento de los objetos. Esto último no es bueno ya que si una clase 'A' conoce el funcionamiento interno de otra clase 'B' y esta última cambia, la clase A probablemente se verá obligada a cambiar, aumentando la complejidad de la lógia del programa y la posibilidad de que se produzcan errores en tiempo de ejecución.
