@@ -142,6 +142,24 @@ TestCase subclass: #SentenceFinderByPrefixTest
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'MP 10/11/2022 21:31:14'!
+test01WhenPrefixIsEmptySFBPReturnsError
+
+	| stack sentenceFinder|
+	
+	stack := OOStack new.
+	stack push: 'ferro'.
+	stack push: 'atlanta'.
+	
+	sentenceFinder := SentenceFinderByPrefix new.
+	
+	self assert: (sentenceFinder find: '' = 'un Error').
+	"[ self assert: sentenceFinder find: ''. self fail ] on: 
+	aResponse := [ :anError | self Assert: johnLennon isInA: customerBook with: 1].
+	anAction aTypeOfError		do: aResponse."
+	
+	"[self assert: sentenceFinder find: ''.] should: []"! !
+
 
 !classDefinition: #OOStack category: 'Stack-Exercise'!
 Object subclass: #OOStack
@@ -161,27 +179,58 @@ isEmpty
 
 	^elements isEmpty.! !
 
+!OOStack methodsFor: 'empty or not' stamp: 'MP 10/9/2022 17:05:03'!
+notEmpty
 
-!OOStack methodsFor: 'primitives' stamp: 'MP 10/9/2022 15:06:52'!
+	^elements notEmpty.! !
+
+
+!OOStack methodsFor: 'primitives' stamp: 'MP 10/9/2022 17:30:39'!
 pop
-	elements isEmpty ifTrue: [^self error: self class stackEmptyErrorDescription].
-	^elements removeLast.! !
+	^self handler pop.! !
 
 !OOStack methodsFor: 'primitives' stamp: 'MP 10/9/2022 14:49:01'!
 push: anElement
 
 	elements add: anElement.! !
 
-!OOStack methodsFor: 'primitives' stamp: 'MP 10/9/2022 15:09:40'!
+!OOStack methodsFor: 'primitives' stamp: 'MP 10/9/2022 17:33:55'!
 top
-	elements isEmpty ifTrue: [^self error: self class stackEmptyErrorDescription].
-	^elements last.! !
+	^self handler top.
+	
+	"elements isEmpty ifTrue: [^self error: self class stackEmptyErrorDescription].
+	^elements last."! !
 
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'MP 10/9/2022 17:14:41'!
+handler
+
+	^StackHandler kindOfHandlerFor: self.! !
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'MP 10/9/2022 17:11:18'!
+popIfEmpty
+
+	^self error: self class stackEmptyErrorDescription.! !
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'MP 10/9/2022 17:12:31'!
+popIfNotEmpty
+
+	^elements removeLast.! !
 
 !OOStack methodsFor: 'as yet unclassified' stamp: 'MP 10/9/2022 14:54:20'!
 size
 
 	^elements size.! !
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'MP 10/9/2022 17:35:26'!
+topIfEmpty
+	
+	^self error: self class stackEmptyErrorDescription.! !
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'MP 10/9/2022 17:35:43'!
+topIfNotEmpty
+
+	^elements last.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -201,3 +250,110 @@ Object subclass: #SentenceFinderByPrefix
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
+
+!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'MP 10/11/2022 21:10:21'!
+find: aPrefix
+! !
+
+
+!classDefinition: #StackHandler category: 'Stack-Exercise'!
+Object subclass: #StackHandler
+	instanceVariableNames: 'mainStack'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!StackHandler methodsFor: 'as yet unclassified' stamp: 'MP 10/9/2022 17:28:11'!
+initializeFor: aStack
+
+	mainStack := aStack.! !
+
+!StackHandler methodsFor: 'as yet unclassified' stamp: 'MP 10/9/2022 17:06:45'!
+pop
+	
+	self subclassResponsibility.! !
+
+!StackHandler methodsFor: 'as yet unclassified' stamp: 'MP 10/9/2022 17:07:08'!
+top
+	
+	self subclassResponsibility.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'StackHandler class' category: 'Stack-Exercise'!
+StackHandler class
+	instanceVariableNames: ''!
+
+!StackHandler class methodsFor: 'as yet unclassified' stamp: 'MP 10/9/2022 17:21:44'!
+canInstanciate: aStack
+
+	self subclassResponsibility.! !
+
+!StackHandler class methodsFor: 'as yet unclassified' stamp: 'MP 10/9/2022 17:26:58'!
+handlerFor: aStack
+
+	^self new initializeFor: aStack.! !
+
+!StackHandler class methodsFor: 'as yet unclassified' stamp: 'MP 10/9/2022 17:27:30'!
+kindOfHandlerFor: aStack
+
+	^(self subclasses detect: [:aHandlerClass | aHandlerClass canInstanciate: aStack ]) handlerFor: aStack.! !
+
+
+!classDefinition: #Empty category: 'Stack-Exercise'!
+StackHandler subclass: #Empty
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!Empty methodsFor: 'as yet unclassified' stamp: 'MP 10/9/2022 17:09:52'!
+pop
+
+	^mainStack popIfEmpty.! !
+
+!Empty methodsFor: 'as yet unclassified' stamp: 'MP 10/11/2022 21:03:27'!
+top
+
+	^mainStack topIfEmpty.
+	"main             topWhen"! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Empty class' category: 'Stack-Exercise'!
+Empty class
+	instanceVariableNames: ''!
+
+!Empty class methodsFor: 'as yet unclassified' stamp: 'MP 10/9/2022 17:22:14'!
+canInstanciate: aStack
+
+	^aStack isEmpty.! !
+
+
+!classDefinition: #NotEmpty category: 'Stack-Exercise'!
+StackHandler subclass: #NotEmpty
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!NotEmpty methodsFor: 'as yet unclassified' stamp: 'MP 10/9/2022 17:10:01'!
+pop
+
+	^mainStack popIfNotEmpty.! !
+
+!NotEmpty methodsFor: 'as yet unclassified' stamp: 'MP 10/9/2022 17:34:37'!
+top
+
+	^mainStack topIfNotEmpty.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'NotEmpty class' category: 'Stack-Exercise'!
+NotEmpty class
+	instanceVariableNames: ''!
+
+!NotEmpty class methodsFor: 'as yet unclassified' stamp: 'MP 10/9/2022 17:22:41'!
+canInstanciate: aStack
+
+	^aStack notEmpty.! !
