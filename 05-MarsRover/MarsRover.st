@@ -5,16 +5,6 @@ TestCase subclass: #TestMarsRover
 	poolDictionaries: ''
 	category: 'MarsRover'!
 
-!TestMarsRover methodsFor: 'test - facing north' stamp: 'MP 10/29/2022 18:13:25'!
-test01RoverDoesNotMoveWhenReceivesEmptyCommand
-	|aRover |
-
-	aRover := MarsRover newInPosition: 0@0 facing: 'n'.
-	
-	aRover moveWithCommands: ''.
-
-	self assert: (aRover expectedPositionIs: 0@0 andDirectionIs: 'n' ).! !
-
 !TestMarsRover methodsFor: 'test - facing north' stamp: 'MP 10/29/2022 19:17:13'!
 test02RoverFacingNorthMovesOnePositionForwardInYAxisWhenReceivesFCommand
 	|aRover |
@@ -195,15 +185,53 @@ test17RoverFacingWestRotatesNorthWhenReceivesRCommand
 	"WhenRoverReceives"! !
 
 
-!TestMarsRover methodsFor: 'as yet unclassified' stamp: 'MP 10/29/2022 19:30:53'!
-test18
+!TestMarsRover methodsFor: 'test - dont move' stamp: 'MP 10/29/2022 18:13:25'!
+test01RoverDoesNotMoveWhenReceivesEmptyCommand
+	|aRover |
+
+	aRover := MarsRover newInPosition: 0@0 facing: 'n'.
+	
+	aRover moveWithCommands: ''.
+
+	self assert: (aRover expectedPositionIs: 0@0 andDirectionIs: 'n' ).! !
+
+!TestMarsRover methodsFor: 'test - dont move' stamp: 'MP 11/1/2022 14:38:55'!
+test20RoverDoesNotMoveAndRaisesErrorWhenReceivesAnInvalidCommandFirst
 	| aRover |
 	
 	aRover := MarsRover newInPosition: (0@0) facing: 'n'.
 	
-	aRover moveWithCommands: 'nn'.
+	self should: [aRover moveWithCommands: ' '] raise: Error withExceptionDo: [:anError | 
+		self assert: (aRover expectedPositionIs: 0@0 andDirectionIs: 'n').
+		self assert: anError messageText equals: MarsRover marsRoverInvalidCommandDescription.
+		].! !
+
+
+!TestMarsRover methodsFor: 'test - multiple movements' stamp: 'MP 11/1/2022 14:35:00'!
+test18RoverMovesAsExpectedWhenReceivesAMultipleCommandString
+	| aRover |
 	
-	self assert: (aRover expectedPositionIs: 0@1 andDirectionIs: 'n' ).
+	aRover := MarsRover newInPosition: (0@0) facing: 'n'.
+	
+	aRover moveWithCommands: 'ff'.
+	
+	self assert: (aRover expectedPositionIs: 0@2 andDirectionIs: 'n' ).
+	! !
+
+!TestMarsRover methodsFor: 'test - multiple movements' stamp: 'MP 11/1/2022 14:39:54'!
+test19RoverStopsMovingAndRaisesErrorWhenReceivesAnInvalidComand
+	| aRover |
+	
+	aRover := MarsRover newInPosition: (0@0) facing: 'n'.
+	
+	
+	
+	self should: [aRover moveWithCommands: 'ffñff'] raise: Error withExceptionDo: [:anError | 
+		self assert: (aRover expectedPositionIs: 0@2 andDirectionIs: 'n').
+		self assert: anError messageText equals: MarsRover marsRoverInvalidCommandDescription.
+		].
+	
+	
 	! !
 
 
@@ -225,7 +253,7 @@ initializeInPosition: aPosition facing: aCardinalPoint
 	position := aPosition.
 	direction := aCardinalPoint.! !
 
-!MarsRover methodsFor: 'as yet unclassified' stamp: 'MP 10/29/2022 19:20:28'!
+!MarsRover methodsFor: 'as yet unclassified' stamp: 'MP 11/1/2022 14:16:24'!
 moveBackwards
 
 	direction = 'n' ifTrue: [position := position + (0@-1)].
@@ -241,13 +269,15 @@ moveForward
 	direction = 's' ifTrue: [position := position + (0@-1)].
 	direction = 'w' ifTrue: [position := position + (-1@0)].! !
 
-!MarsRover methodsFor: 'as yet unclassified' stamp: 'MP 10/29/2022 19:41:55'!
+!MarsRover methodsFor: 'as yet unclassified' stamp: 'MP 11/1/2022 14:16:42'!
 moveWithACommand: aCommand
 
-	aCommand = 'f' ifTrue: [self moveForward].
-	aCommand = 'b' ifTrue: [self moveBackwards].
-	aCommand = 'r' ifTrue: [self rotateRight].
-	aCommand = 'l' ifTrue: [self rotateLeft].
+	aCommand = $f ifTrue: [^self moveForward].
+	aCommand = $b ifTrue: [^self moveBackwards].
+	aCommand = $r ifTrue: [^self rotateRight].
+	aCommand = $l ifTrue: [^self rotateLeft].
+	self error: self class marsRoverInvalidCommandDescription.
+	
 	
 ! !
 
@@ -289,6 +319,11 @@ rotateRight
 !classDefinition: 'MarsRover class' category: 'MarsRover'!
 MarsRover class
 	instanceVariableNames: ''!
+
+!MarsRover class methodsFor: 'as yet unclassified' stamp: 'MP 11/1/2022 14:23:50'!
+marsRoverInvalidCommandDescription
+
+	^'invalid command'! !
 
 !MarsRover class methodsFor: 'as yet unclassified' stamp: 'MP 10/29/2022 17:15:23'!
 newInPosition: aPosition facing: aCardinalPoint.
