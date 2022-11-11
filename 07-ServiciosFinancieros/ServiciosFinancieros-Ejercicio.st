@@ -5,14 +5,14 @@ TestCase subclass: #PortfolioTest
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MP 11/10/2022 20:11:28'!
+!PortfolioTest methodsFor: 'tests' stamp: 'MP 11/10/2022 20:11:28'!
 test01PortfolioWithoutAccountsHasABalanceOfZero
 	|aPortfolio|
 	aPortfolio := Portfolio new.
 	
 	self assert: aPortfolio balance equals: 0.! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MP 11/10/2022 20:13:04'!
+!PortfolioTest methodsFor: 'tests' stamp: 'MP 11/10/2022 20:13:04'!
 test02PortfolioWithOneAccountHasSameBalanceAsAccount
 	|aPortfolio anAccount|
 	
@@ -22,7 +22,7 @@ test02PortfolioWithOneAccountHasSameBalanceAsAccount
 	
 	self assert: aPortfolio balance equals: 100.! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MP 11/10/2022 20:17:36'!
+!PortfolioTest methodsFor: 'tests' stamp: 'MP 11/10/2022 20:17:36'!
 test03MamushkaPortfolioBalanceIsTheSumOfItsAccountsBalances
 	|aPortfolio anAccount anotherPortfolio anotherAccount|
 	
@@ -40,7 +40,7 @@ test03MamushkaPortfolioBalanceIsTheSumOfItsAccountsBalances
 	
 	self assert: aPortfolio balance equals: 50.! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MP 11/10/2022 20:20:08'!
+!PortfolioTest methodsFor: 'tests' stamp: 'MP 11/10/2022 20:20:08'!
 test04PortfolioWithoutAccountsDoesNotRegisterTransactions
 	|aPortfolio|
 	
@@ -48,7 +48,7 @@ test04PortfolioWithoutAccountsDoesNotRegisterTransactions
 	
 	self assert: (aPortfolio hasRegistered: (Deposit for: 100)) equals: false.! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MP 11/10/2022 20:23:48'!
+!PortfolioTest methodsFor: 'tests' stamp: 'MP 11/10/2022 20:23:48'!
 test05PortfolioWithOneAccountRegistersATransactionOfThatAccount
 	|aPortfolio anAccount aTransaction |
 	
@@ -62,7 +62,7 @@ test05PortfolioWithOneAccountRegistersATransactionOfThatAccount
 	
 	self assert: (aPortfolio hasRegistered: aTransaction). ! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MP 11/10/2022 21:39:32'!
+!PortfolioTest methodsFor: 'tests' stamp: 'MP 11/10/2022 21:39:32'!
 test06MamushkaPorfolioRegistersTransactionInCompositePortfolioAccount
 
 	|componentPortfolio compositePortfolioAccountTransaction compositePortfolioAccount compositePortfolio |
@@ -80,12 +80,12 @@ test06MamushkaPorfolioRegistersTransactionInCompositePortfolioAccount
 	
 	self assert: (componentPortfolio hasRegistered: compositePortfolioAccountTransaction).! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MP 11/10/2022 21:48:33'!
+!PortfolioTest methodsFor: 'tests' stamp: 'MP 11/10/2022 21:48:33'!
 test07PortfolioWithoutAccountsDoesNotHaveTransactions
 	
 	self assert: (Portfolio new transactions isEmpty).! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MP 11/10/2022 21:55:10'!
+!PortfolioTest methodsFor: 'tests' stamp: 'MP 11/10/2022 21:55:10'!
 test08PortfolioWithOneAccountIncludesItsAccountTransaction
 
 	|aPortfolio anAccount aTransaction |
@@ -100,7 +100,7 @@ test08PortfolioWithOneAccountIncludesItsAccountTransaction
 	
 	self assert: (aPortfolio transactions includes: aTransaction).! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'MP 11/10/2022 22:00:13'!
+!PortfolioTest methodsFor: 'tests' stamp: 'MP 11/10/2022 22:00:13'!
 test09MamushkaPortfolioRegistersAllOfItsAccountsTransactions
 
 	|componentPortfolio compositePortfolioAccountTransaction componentPortfolioAccount componentPortfolioAccountTransaction compositePortfolioAccount compositePortfolio componentPortfolioTransactions |
@@ -123,6 +123,41 @@ test09MamushkaPortfolioRegistersAllOfItsAccountsTransactions
 	self assert: (componentPortfolioTransactions includes: componentPortfolioAccountTransaction).	
 	self assert: componentPortfolioTransactions size equals: 2.
 	! !
+
+
+!PortfolioTest methodsFor: 'tests - extra' stamp: 'MP 11/11/2022 16:43:24'!
+test10PortfolioCanNotAddTheSameAccountTwice
+
+	|aPortfolio anAccount|
+	
+	aPortfolio := Portfolio new.
+	anAccount := ReceptiveAccount new.
+	
+	aPortfolio add: anAccount .
+	
+	self should: [aPortfolio add: anAccount] raise: Error withExceptionDo: [:anError | 
+		self assert: (anError messageText) equals: Portfolio canNotAddTheSameAccountTwiceErrorMessage.
+		self assert: (aPortfolio accountsSize) equals: 1.
+		].
+		! !
+
+!PortfolioTest methodsFor: 'tests - extra' stamp: 'MP 11/11/2022 16:45:22'!
+test11CanNotAddAnAccountToAComponentPortfolioThatAlreadyIncludesThatAccountInItsSons
+
+	|componentPortfolio anAccount compositePortfolio|
+	
+	componentPortfolio := Portfolio new.
+
+	anAccount := ReceptiveAccount new.
+	compositePortfolio := Portfolio with: anAccount.
+	componentPortfolio add: compositePortfolio.
+	
+	self should: [componentPortfolio add: anAccount] raise: Error withExceptionDo: [:anError | 
+		self assert: (componentPortfolio includesAccount: compositePortfolio).
+		self assert: (componentPortfolio accountsSize) equals: 1.
+		self assert: (anError messageText) equals: Portfolio canNotAddTheSameAccountTwiceErrorMessage.		
+		].
+		! !
 
 
 !classDefinition: #ReceptiveAccountTest category: 'ServiciosFinancieros-Ejercicio'!
@@ -223,8 +258,8 @@ TestCase subclass: #TransferTest
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
 
-!TransferTest methodsFor: 'as yet unclassified' stamp: 'MP 11/6/2022 21:00:55'!
-test01ATransactionWithAnAmmountWhenBothAccountsAreZeroLeavesTheOriginWithTheAmmountNegativeAndTheDestinationWithThePositive "??????? "
+!TransferTest methodsFor: 'tests' stamp: 'MP 11/11/2022 16:49:07'!
+test01ATransactionWithAnAmmountWhenBothAccountsAreZeroLeavesTheOriginWithTheAmmountNegativeAndTheDestinationWithThePositive
 
 	| originAccount destinationAccount |
 	
@@ -236,7 +271,7 @@ test01ATransactionWithAnAmmountWhenBothAccountsAreZeroLeavesTheOriginWithTheAmmo
 	self assert: originAccount balance equals: -100*peso.
 	self assert: destinationAccount balance equals: 100*peso.! !
 
-!TransferTest methodsFor: 'as yet unclassified' stamp: 'MP 11/6/2022 21:05:26'!
+!TransferTest methodsFor: 'tests' stamp: 'MP 11/6/2022 21:05:26'!
 test02TransferLegsAreRegisteredInTheAccountTransactions
 
 	| originAccount destinationAccount transfer|
@@ -249,7 +284,7 @@ test02TransferLegsAreRegisteredInTheAccountTransactions
 	self assert: (originAccount hasRegistered: transfer withdrawLeg).
 	self assert: (destinationAccount hasRegistered: transfer depositLeg).! !
 
-!TransferTest methodsFor: 'as yet unclassified' stamp: 'MP 11/6/2022 21:07:57'!
+!TransferTest methodsFor: 'tests' stamp: 'MP 11/6/2022 21:07:57'!
 test03DepositLegKnowsWithdrawLeg
 	| transfer|
 	
@@ -257,7 +292,7 @@ test03DepositLegKnowsWithdrawLeg
 
 	self assert: transfer withdrawLeg equals: transfer depositLeg withdrawLeg.! !
 
-!TransferTest methodsFor: 'as yet unclassified' stamp: 'MP 11/6/2022 21:07:35'!
+!TransferTest methodsFor: 'tests' stamp: 'MP 11/6/2022 21:07:35'!
 test04WithdrawLegKnowsDepositLeg
 	| transfer|
 	
@@ -265,7 +300,7 @@ test04WithdrawLegKnowsDepositLeg
 
 	self assert: transfer depositLeg equals: transfer withdrawLeg depositLeg.! !
 
-!TransferTest methodsFor: 'as yet unclassified' stamp: 'MP 11/6/2022 21:09:50'!
+!TransferTest methodsFor: 'tests' stamp: 'MP 11/6/2022 21:09:50'!
 test05AnAccountCanNotTransferToItself
 
 	| originAccount |
@@ -279,7 +314,7 @@ test05AnAccountCanNotTransferToItself
 			self assert: anError messageText equals: Transfer accountCanNotTransferToItselfErrorMessage.
 		] .! !
 
-!TransferTest methodsFor: 'as yet unclassified' stamp: 'MP 11/6/2022 21:11:30'!
+!TransferTest methodsFor: 'tests' stamp: 'MP 11/6/2022 21:11:30'!
 test06AnAccountCanNotTransferNegativeOrZeroValues
 
 	| originAccount destinationAccount |
@@ -302,6 +337,21 @@ Object subclass: #Account
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
 
+!Account methodsFor: 'main protocol' stamp: 'MP 11/11/2022 14:55:52'!
+balance
+
+	self subclassResponsibility.! !
+
+!Account methodsFor: 'main protocol' stamp: 'MP 11/11/2022 14:55:45'!
+hasRegistered: aTransaction
+
+	self subclassResponsibility.! !
+
+!Account methodsFor: 'main protocol' stamp: 'MP 11/11/2022 14:55:58'!
+transactions
+
+	self subclassResponsibility.! !
+
 
 !classDefinition: #Portfolio category: 'ServiciosFinancieros-Ejercicio'!
 Account subclass: #Portfolio
@@ -310,39 +360,63 @@ Account subclass: #Portfolio
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
 
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'MP 11/8/2022 20:49:21'!
+!Portfolio methodsFor: 'initialization' stamp: 'MP 11/8/2022 20:58:43'!
+initialize
+
+	accounts := OrderedCollection new.! !
+
+!Portfolio methodsFor: 'initialization' stamp: 'MP 11/8/2022 20:48:16'!
+initializeWith: anAccount
+
+	accounts := OrderedCollection with: anAccount.! !
+
+
+!Portfolio methodsFor: 'main protocol' stamp: 'MP 11/11/2022 16:04:13'!
 add: anAccount
+
+	(self anyPortfolioIncludes: anAccount) ifTrue: [self error: self class canNotAddTheSameAccountTwiceErrorMessage].
 
 	accounts add: anAccount.! !
 
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'MP 11/8/2022 20:53:47'!
+!Portfolio methodsFor: 'main protocol' stamp: 'MP 11/8/2022 20:53:47'!
 balance
 	|totalBalance|
 	totalBalance := 0.
 	accounts do: [:anAccount | totalBalance := totalBalance + anAccount balance].
 	^totalBalance.! !
 
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'MP 11/10/2022 20:30:04'!
+!Portfolio methodsFor: 'main protocol' stamp: 'MP 11/10/2022 20:30:04'!
 hasRegistered: aTransaction
 
 	^accounts anySatisfy: [:anAccount | anAccount hasRegistered: aTransaction].! !
 
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'MP 11/8/2022 20:58:43'!
-initialize
-
-	accounts := OrderedCollection new.! !
-
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'MP 11/8/2022 20:48:16'!
-initializeWith: anAccount
-
-	accounts := OrderedCollection with: anAccount.! !
-
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'MP 11/10/2022 21:33:00'!
+!Portfolio methodsFor: 'main protocol' stamp: 'MP 11/10/2022 21:33:00'!
 transactions 
 	|totalTransactions|
 	totalTransactions := OrderedCollection new.
 	accounts do:[:anAccount | totalTransactions addAllLast: anAccount transactions].
 	^totalTransactions.! !
+
+
+!Portfolio methodsFor: 'extra' stamp: 'MP 11/11/2022 15:10:38'!
+accountsSize
+
+	^accounts size.! !
+
+!Portfolio methodsFor: 'extra' stamp: 'MP 11/11/2022 16:40:22'!
+anyPortfolioIncludes: anAccount
+
+	^accounts anySatisfy: [:aPortfolioSon | aPortfolioSon includesTheAccount: anAccount].! !
+
+!Portfolio methodsFor: 'extra' stamp: 'MP 11/11/2022 15:52:41'!
+includesAccount: anAccount
+
+	^accounts includes: anAccount.! !
+
+!Portfolio methodsFor: 'extra' stamp: 'MP 11/11/2022 16:39:15'!
+includesTheAccount: anAccount
+
+	^ self = anAccount or: 	[ accounts anySatisfy: [ :eachAccount | (eachAccount includesTheAccount: anAccount)]].! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -350,10 +424,16 @@ transactions
 Portfolio class
 	instanceVariableNames: ''!
 
-!Portfolio class methodsFor: 'as yet unclassified' stamp: 'MP 11/8/2022 20:37:17'!
+!Portfolio class methodsFor: 'instance creation' stamp: 'MP 11/11/2022 15:13:26'!
 with: anAccount
 
 	^self new initializeWith: anAccount.! !
+
+
+!Portfolio class methodsFor: 'error messages' stamp: 'MP 11/11/2022 15:12:28'!
+canNotAddTheSameAccountTwiceErrorMessage
+
+	^'cannot add the same account twice'! !
 
 
 !classDefinition: #ReceptiveAccount category: 'ServiciosFinancieros-Ejercicio'!
@@ -395,17 +475,16 @@ transactions
 
 	^ transactions copy! !
 
-
-!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'MP 11/6/2022 19:25:45'!
+!ReceptiveAccount methodsFor: 'main protocol' stamp: 'MP 11/6/2022 19:25:45'!
 transactionsIsEmpty
 
 	^transactions isEmpty.! !
 
-!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'MP 11/6/2022 16:06:26'!
-transferTo: accountToTransfer forValue: aTransferValue
 
-	Withdraw register: aTransferValue on: self.
-	Deposit register: aTransferValue on: accountToTransfer.! !
+!ReceptiveAccount methodsFor: 'extra' stamp: 'MP 11/11/2022 16:17:22'!
+includesTheAccount: anAccount
+
+	^self = anAccount.! !
 
 
 !classDefinition: #AccountTransaction category: 'ServiciosFinancieros-Ejercicio'!
@@ -421,7 +500,7 @@ value
 	self subclassResponsibility ! !
 
 
-!AccountTransaction methodsFor: 'as yet unclassified' stamp: 'MP 11/6/2022 15:58:31'!
+!AccountTransaction methodsFor: 'balance' stamp: 'MP 11/6/2022 15:58:31'!
 modifyBalance: aBalance
 
 	self subclassResponsibility.! !
@@ -462,7 +541,7 @@ value
 	^ value! !
 
 
-!Deposit methodsFor: 'as yet unclassified' stamp: 'MP 11/6/2022 16:03:42'!
+!Deposit methodsFor: 'balance' stamp: 'MP 11/6/2022 16:03:42'!
 modifyBalance: aBalance
 
 	^aBalance + value.! !
@@ -486,12 +565,13 @@ AccountTransaction subclass: #TransferLeg
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
 
-!TransferLeg methodsFor: 'as yet unclassified' stamp: 'MP 11/6/2022 18:36:45'!
+!TransferLeg methodsFor: 'initialization' stamp: 'MP 11/6/2022 18:36:45'!
 initializeAsLegOf: aTransfer
 
 	transfer := aTransfer.! !
 
-!TransferLeg methodsFor: 'as yet unclassified' stamp: 'MP 11/6/2022 18:36:50'!
+
+!TransferLeg methodsFor: 'value' stamp: 'MP 11/6/2022 18:36:50'!
 value
 
 	^transfer value.! !
@@ -502,7 +582,7 @@ value
 TransferLeg class
 	instanceVariableNames: ''!
 
-!TransferLeg class methodsFor: 'as yet unclassified' stamp: 'MP 11/6/2022 18:37:38'!
+!TransferLeg class methodsFor: 'instance creation' stamp: 'MP 11/6/2022 18:37:38'!
 asLegOf: aTransfer
 
 	^self new initializeAsLegOf: aTransfer.! !
@@ -515,12 +595,13 @@ TransferLeg subclass: #DepositLeg
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
 
-!DepositLeg methodsFor: 'as yet unclassified' stamp: 'MP 11/6/2022 18:36:38'!
+!DepositLeg methodsFor: 'balance' stamp: 'MP 11/6/2022 18:36:38'!
 modifyBalance: aBalance
 
 	^aBalance + self value! !
 
-!DepositLeg methodsFor: 'as yet unclassified' stamp: 'MP 11/6/2022 18:54:27'!
+
+!DepositLeg methodsFor: 'legs' stamp: 'MP 11/6/2022 18:54:27'!
 withdrawLeg
 
 	^transfer withdrawLeg. ! !
@@ -533,15 +614,16 @@ TransferLeg subclass: #WithdrawLeg
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
 
-!WithdrawLeg methodsFor: 'as yet unclassified' stamp: 'MP 11/6/2022 18:54:36'!
-depositLeg
-
-	^transfer depositLeg.! !
-
-!WithdrawLeg methodsFor: 'as yet unclassified' stamp: 'MP 11/6/2022 18:36:23'!
+!WithdrawLeg methodsFor: 'balance' stamp: 'MP 11/6/2022 18:36:23'!
 modifyBalance: aBalance
 
 	^aBalance - self value! !
+
+
+!WithdrawLeg methodsFor: 'legs' stamp: 'MP 11/6/2022 18:54:36'!
+depositLeg
+
+	^transfer depositLeg.! !
 
 
 !classDefinition: #Withdraw category: 'ServiciosFinancieros-Ejercicio'!
@@ -563,7 +645,7 @@ value
 	^ value! !
 
 
-!Withdraw methodsFor: 'as yet unclassified' stamp: 'MP 11/6/2022 16:03:34'!
+!Withdraw methodsFor: 'balance' stamp: 'MP 11/6/2022 16:03:34'!
 modifyBalance: aBalance
 
 	^aBalance - value.! !
@@ -587,27 +669,29 @@ Object subclass: #Transfer
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
 
-!Transfer methodsFor: 'as yet unclassified' stamp: 'MP 11/6/2022 18:31:42'!
+!Transfer methodsFor: 'value' stamp: 'MP 11/6/2022 18:32:07'!
+value
+
+	^value! !
+
+
+!Transfer methodsFor: 'legs' stamp: 'MP 11/6/2022 18:31:42'!
 depositLeg
 
 	^depositLeg! !
 
-!Transfer methodsFor: 'as yet unclassified' stamp: 'MP 11/6/2022 18:32:01'!
+!Transfer methodsFor: 'legs' stamp: 'MP 11/6/2022 18:32:13'!
+withdrawLeg
+
+	^withdrawLeg! !
+
+
+!Transfer methodsFor: 'initialization' stamp: 'MP 11/6/2022 18:32:01'!
 initializeFor: aTransferValue
 
 	value := aTransferValue.
 	depositLeg := DepositLeg asLegOf: self.
 	withdrawLeg := WithdrawLeg asLegOf: self.! !
-
-!Transfer methodsFor: 'as yet unclassified' stamp: 'MP 11/6/2022 18:32:07'!
-value
-
-	^value! !
-
-!Transfer methodsFor: 'as yet unclassified' stamp: 'MP 11/6/2022 18:32:13'!
-withdrawLeg
-
-	^withdrawLeg! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -615,31 +699,37 @@ withdrawLeg
 Transfer class
 	instanceVariableNames: ''!
 
-!Transfer class methodsFor: 'as yet unclassified' stamp: 'MP 11/6/2022 20:40:39'!
-accountCanNotTransferNegativeOrZeroErrorMessage
+!Transfer class methodsFor: 'instance creation' stamp: 'MP 11/11/2022 14:51:48'!
+assertTransferValue: aTransferValue isPositiveAndThe: originAccount isNotThe: destinationAccount
 
-	^'An account can not transfer a zero or negative ammount'! !
+	originAccount = destinationAccount ifTrue: [self error: self accountCanNotTransferToItselfErrorMessage].
+	(aTransferValue >0) ifFalse: [self error: self accountCanNotTransferNegativeOrZeroErrorMessage ]! !
 
-!Transfer class methodsFor: 'as yet unclassified' stamp: 'MP 11/6/2022 19:27:09'!
-accountCanNotTransferToItselfErrorMessage
-
-	^'An account can not transfer to itself'! !
-
-!Transfer class methodsFor: 'as yet unclassified' stamp: 'MP 11/6/2022 18:38:20'!
+!Transfer class methodsFor: 'instance creation' stamp: 'MP 11/6/2022 18:38:20'!
 for: aTransferValue.
 
 	^self new initializeFor: aTransferValue.! !
 
-!Transfer class methodsFor: 'as yet unclassified' stamp: 'MP 11/6/2022 20:46:46'!
+!Transfer class methodsFor: 'instance creation' stamp: 'MP 11/11/2022 14:51:48'!
 register: aTransferValue from: originAccount to: destinationAccount
 
 	| transaction |
 	
-	originAccount = destinationAccount ifTrue: [self error: self accountCanNotTransferToItselfErrorMessage].
-	(aTransferValue <0 or: [aTransferValue = 0]) ifTrue: [self error: self accountCanNotTransferNegativeOrZeroErrorMessage ].
+	self assertTransferValue: aTransferValue isPositiveAndThe: originAccount isNotThe: destinationAccount.
 	
 	transaction := self for: aTransferValue.
 	originAccount register: transaction withdrawLeg.
 	destinationAccount register: transaction depositLeg.
 		
 	^ transaction	.! !
+
+
+!Transfer class methodsFor: 'error messages' stamp: 'MP 11/6/2022 20:40:39'!
+accountCanNotTransferNegativeOrZeroErrorMessage
+
+	^'An account can not transfer a zero or negative ammount'! !
+
+!Transfer class methodsFor: 'error messages' stamp: 'MP 11/6/2022 19:27:09'!
+accountCanNotTransferToItselfErrorMessage
+
+	^'An account can not transfer to itself'! !
