@@ -78,7 +78,7 @@ test06
 	self assert: report includes: 'Deposito por 60 * pesos'.
 	self assert: (report last) equals: 'Balance = 10 * pesos'.! !
 
-!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'MP 11/13/2022 22:00:36'!
+!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'MP 11/15/2022 21:08:07'!
 test07
 	|originAccount destinationAccount report aPortfolio|
 	
@@ -92,7 +92,8 @@ test07
 
 	self assert: report includes: 'Extraccion por 40 * pesos'.
 	self assert: report includes: 'Deposito por 60 * pesos'.
-	self assert: (report last) equals: 'Balance = 20 * pesos'.! !
+	self assert: (report last) equals: 'Balance = 20 * pesos'.
+	! !
 
 
 !classDefinition: #PortfolioTest category: 'ServiciosFinancieros-Solucion'!
@@ -399,6 +400,64 @@ test07AccountKnowsItsTransactions
 	self assert: 1 equals: account transactions size.
 	self assert: (account transactions includes: deposit).
 ! !
+
+
+!classDefinition: #TransferNetTest category: 'ServiciosFinancieros-Solucion'!
+TestCase subclass: #TransferNetTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Solucion'!
+
+!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'MP 11/15/2022 18:20:29'!
+test01
+
+	self assert: (TransferNet for: ReceptiveAccount new) value equals: 0.! !
+
+!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'MP 11/15/2022 18:30:15'!
+test02
+	|anAccount anotherAccount|
+	
+	anAccount := ReceptiveAccount new.
+	anotherAccount := ReceptiveAccount new.
+	Transfer amount: 50 from: anAccount to: anotherAccount.
+	
+	self assert: (TransferNet for: anAccount) value equals: -50.! !
+
+!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'MP 11/15/2022 18:31:40'!
+test03
+	|anAccount|
+	
+	anAccount := ReceptiveAccount new.
+	Deposit register: 100 on: anAccount.
+	
+	self assert: (TransferNet for: anAccount) value equals: 0.! !
+
+!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'MP 11/15/2022 21:26:00'!
+test04
+	|anAccount aPortfolio anotherAccount |
+	
+	anAccount := ReceptiveAccount new.
+	aPortfolio := Portfolio with: anAccount.
+	anotherAccount := ReceptiveAccount new.
+	aPortfolio add: anotherAccount.
+	Transfer amount: 50 from: anAccount to: anotherAccount.
+
+	self assert: (TransferNet for: aPortfolio) value equals: 0.! !
+
+!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'MP 11/15/2022 21:36:18'!
+test05
+	|anAccount aPortfolio anotherAccount thirdAccount |
+	
+	anAccount := ReceptiveAccount new.
+	anotherAccount := ReceptiveAccount new.
+	aPortfolio := Portfolio with: anAccount with: anotherAccount.
+	thirdAccount := ReceptiveAccount new.
+	
+	Transfer amount: 50 from: anAccount to: thirdAccount.
+	Transfer amount: 30 from: anAccount to: thirdAccount.
+		
+	self assert: (TransferNet for: aPortfolio) value equals: -80.! !
 
 
 !classDefinition: #TransferTest category: 'ServiciosFinancieros-Solucion'!
@@ -857,6 +916,12 @@ value
 	self subclassResponsibility ! !
 
 
+!AccountTransaction methodsFor: 'transfer net' stamp: 'MP 11/15/2022 18:37:06'!
+affectTransferNet: aTransferNet
+
+	^0. ! !
+
+
 !AccountTransaction methodsFor: 'balance' stamp: 'HAW 5/25/2019 11:25:39'!
 affectBalance: aBalance
 
@@ -928,6 +993,12 @@ initializeWith: aTransfer
 
 	transfer := aTransfer! !
 
+
+!TransferLeg methodsFor: 'transfer net' stamp: 'MP 11/15/2022 18:40:58'!
+affectTransferNet: aTransferNet
+
+	^self subclassResponsibility.! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'TransferLeg class' category: 'ServiciosFinancieros-Solucion'!
@@ -958,6 +1029,12 @@ withdrawLeg
 	^transfer withdrawLeg! !
 
 
+!TransferDepositLeg methodsFor: 'transfer net' stamp: 'MP 11/15/2022 18:38:15'!
+affectTransferNet: aTransferNet
+
+	^aTransferNet + self value! !
+
+
 !TransferDepositLeg methodsFor: 'balance' stamp: 'LL 9/20/2020 22:27:49'!
 affectBalance: aBalance
 
@@ -981,6 +1058,12 @@ depositLeg
 affectBalance: aBalance
 
 	^aBalance - self value! !
+
+
+!TransferWithdrawLeg methodsFor: 'transfer net' stamp: 'MP 11/15/2022 18:39:57'!
+affectTransferNet: aTransferNet
+
+	^aTransferNet - self value! !
 
 
 !classDefinition: #Withdraw category: 'ServiciosFinancieros-Solucion'!
@@ -1121,3 +1204,34 @@ amount: anAmountOfMoney from: originAccount to: destinationAccount
 	
 	
 	! !
+
+
+!classDefinition: #TransferNet category: 'ServiciosFinancieros-Solucion'!
+Object subclass: #TransferNet
+	instanceVariableNames: 'account'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Solucion'!
+
+!TransferNet methodsFor: 'as yet unclassified' stamp: 'MP 11/15/2022 18:22:53'!
+initializeFor: anAccount
+
+	account := anAccount.! !
+
+!TransferNet methodsFor: 'as yet unclassified' stamp: 'MP 11/15/2022 18:41:26'!
+value
+
+	^account transactions 
+		inject: 0*peso
+		into: [ :currentTransferNet :transaction | transaction affectTransferNet: currentTransferNet].! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'TransferNet class' category: 'ServiciosFinancieros-Solucion'!
+TransferNet class
+	instanceVariableNames: ''!
+
+!TransferNet class methodsFor: 'as yet unclassified' stamp: 'MP 11/15/2022 18:22:25'!
+for: anAccount
+
+	^self new initializeFor: anAccount.! !
