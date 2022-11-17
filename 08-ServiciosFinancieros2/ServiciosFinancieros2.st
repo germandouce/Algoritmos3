@@ -5,14 +5,13 @@ TestCase subclass: #AccountSummaryTest
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
 
-!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'MP 11/13/2022 21:42:29'!
-test01
-
-	"self assert: (ReceptiveAccount new accountSummary includes: 'Balance = 0 * pesos')."
+!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 17:41:38'!
+test01AcountSummaryForAnAccountWithNoTransactionsOnlyShowsZeroBlanceStringMessage
+	
 	self assert: ((AccountSummary for: ReceptiveAccount new) report includes:  'Balance = 0 * pesos').! !
 
-!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'MP 11/13/2022 21:58:56'!
-test02
+!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 17:21:03'!
+test02AccountSummaryContainsDepositStringMessage
 	|anAccount report |
 	
 	anAccount := ReceptiveAccount new.
@@ -24,8 +23,8 @@ test02
 	self assert: report includes: 'Deposito por 100 * pesos'.
 	self assert: (report last) equals: 'Balance = 100 * pesos'.! !
 
-!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'MP 11/13/2022 21:59:06'!
-test03
+!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 17:20:36'!
+test03AccountSummaryContainsWithdrawStringMessage
 	|anAccount report|
 	
 	anAccount := ReceptiveAccount new.
@@ -36,8 +35,8 @@ test03
 	self assert: report includes: 'Extraccion por 100 * pesos'.
 	self assert: (report last) equals: 'Balance = -100 * pesos'.! !
 
-!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'MP 11/13/2022 21:59:14'!
-test04
+!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 17:57:56'!
+test04AccountSummaryContainsTransferWithdrawStringMessage
 	|originAccount destinationAccount report|
 	
 	originAccount := ReceptiveAccount new.
@@ -49,8 +48,8 @@ test04
 	self assert: report includes: 'Salida por transferencia de 100 * pesos'.
 	self assert: (report last) equals: 'Balance = -100 * pesos'.! !
 
-!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'MP 11/13/2022 22:00:01'!
-test05
+!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 17:25:05'!
+test05AccountSummaryContainsTransferDepositStringMessage
 	|originAccount destinationAccount report|
 	
 	originAccount := ReceptiveAccount new.
@@ -62,8 +61,8 @@ test05
 	self assert: report includes: 'Entrada por transferencia de 100 * pesos'.
 	self assert: (report last) equals: 'Balance = 100 * pesos'.! !
 
-!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'MP 11/13/2022 22:00:19'!
-test06
+!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 17:28:48'!
+test06AccountSummaryContainsAllTransferStringMessages
 	|originAccount destinationAccount report|
 	
 	originAccount := ReceptiveAccount new.
@@ -78,8 +77,8 @@ test06
 	self assert: report includes: 'Deposito por 60 * pesos'.
 	self assert: (report last) equals: 'Balance = 10 * pesos'.! !
 
-!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'MP 11/15/2022 21:08:07'!
-test07
+!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 17:36:49'!
+test07PortfolioBehavesAsAccountForAccountSummary
 	|originAccount destinationAccount report aPortfolio|
 	
 	originAccount := ReceptiveAccount new.
@@ -409,23 +408,13 @@ TestCase subclass: #TransferNetTest
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
 
-!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'MP 11/15/2022 18:20:29'!
-test01
+!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 17:40:34'!
+test01TransferNetValueForAccountWithNoTransfersIsZero
 
 	self assert: (TransferNet for: ReceptiveAccount new) value equals: 0.! !
 
-!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'MP 11/15/2022 18:30:15'!
-test02
-	|anAccount anotherAccount|
-	
-	anAccount := ReceptiveAccount new.
-	anotherAccount := ReceptiveAccount new.
-	Transfer amount: 50 from: anAccount to: anotherAccount.
-	
-	self assert: (TransferNet for: anAccount) value equals: -50.! !
-
-!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'MP 11/15/2022 18:31:40'!
-test03
+!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 18:06:45'!
+test02TransferNetValueForAnAccountWithADepositIsZero
 	|anAccount|
 	
 	anAccount := ReceptiveAccount new.
@@ -433,8 +422,40 @@ test03
 	
 	self assert: (TransferNet for: anAccount) value equals: 0.! !
 
-!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'MP 11/15/2022 21:26:00'!
-test04
+!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 18:06:52'!
+test03TransferNetValueForAnAccountWithAWithdrawIsZero
+	|anAccount|
+	
+	anAccount := ReceptiveAccount new.
+	Withdraw register: 100 on: anAccount.
+	
+	self assert: (TransferNet for: anAccount) value equals: 0.! !
+
+!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 18:09:14'!
+test04TransferNetValueForAnAccountWithATransferWithdrawEqualsTransfersValue
+	
+	|anAccount anotherAccount|
+	
+	anAccount := ReceptiveAccount new.
+	anotherAccount := ReceptiveAccount new.
+	Transfer amount: 100 from: anAccount to: anotherAccount.
+	
+	self assert: (TransferNet for: anAccount) value equals: -100.! !
+
+!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 18:08:56'!
+test05TransferNetValueForAnAccountWithATransferDepositEqualsTransfersValue
+	
+	|anAccount anotherAccount|
+	
+	anAccount := ReceptiveAccount new.
+	anotherAccount := ReceptiveAccount new.
+	Transfer amount: 100 from: anotherAccount to: anAccount.
+	
+	self assert: (TransferNet for: anAccount) value equals: 100.! !
+
+!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 18:07:37'!
+test06WhenTransferingBetweenTwoAccountsInSamePortfolioThePortfolioTransferNetValueIsZero
+
 	|anAccount aPortfolio anotherAccount |
 	
 	anAccount := ReceptiveAccount new.
@@ -444,20 +465,6 @@ test04
 	Transfer amount: 50 from: anAccount to: anotherAccount.
 
 	self assert: (TransferNet for: aPortfolio) value equals: 0.! !
-
-!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'MP 11/15/2022 21:36:18'!
-test05
-	|anAccount aPortfolio anotherAccount thirdAccount |
-	
-	anAccount := ReceptiveAccount new.
-	anotherAccount := ReceptiveAccount new.
-	aPortfolio := Portfolio with: anAccount with: anotherAccount.
-	thirdAccount := ReceptiveAccount new.
-	
-	Transfer amount: 50 from: anAccount to: thirdAccount.
-	Transfer amount: 30 from: anAccount to: thirdAccount.
-		
-	self assert: (TransferNet for: aPortfolio) value equals: -80.! !
 
 
 !classDefinition: #TransferTest category: 'ServiciosFinancieros-Solucion'!
@@ -714,18 +721,10 @@ signalCanNotAddAccount
 	self error: self class canNotAddAccountErrorMessage! !
 
 
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'MP 11/13/2022 21:13:06'!
-accountSummary
-	|stringCollection|
+!Portfolio methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 16:25:26'!
+visitTransactionsWith: aTransactionVisitor
 	
-	stringCollection := OrderedCollection new.
-	
-	accounts do: [:anAccount | stringCollection addAllLast: (anAccount accountSummary)].
-	
-	stringCollection add: ('Balance = ', (self balance asString)).
-	
-	^stringCollection.
-	! !
+	accounts do: [:anAccount| anAccount visitTransactionsWith: aTransactionVisitor ]! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -810,16 +809,6 @@ isComposedBy: anAccount
 	^self = anAccount ! !
 
 
-!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'MP 11/13/2022 20:55:44'!
-accountSummary
-	|collectionOfStrings|
-
-	collectionOfStrings := self addTransactionMessages.
-
-	collectionOfStrings add: ('Balance = ', (self balance asString)).
-
-	^collectionOfStrings! !
-
 !ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'MP 11/13/2022 20:56:02'!
 addTransactionMessages
 	|transactionCollection|
@@ -843,64 +832,10 @@ addTransactionMessages
 	
 	^transactionCollection.! !
 
-
-!classDefinition: #AccountSummary category: 'ServiciosFinancieros-Solucion'!
-Object subclass: #AccountSummary
-	instanceVariableNames: 'account'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'ServiciosFinancieros-Solucion'!
-
-!AccountSummary methodsFor: 'as yet unclassified' stamp: 'MP 11/13/2022 21:52:27'!
-addTransactionMessages "agrega o crea una collection con?"
-	|transactionStringCollection|
+!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 16:12:25'!
+visitTransactionsWith: aTransactionVisitor
 	
-	transactionStringCollection := OrderedCollection new.
-
-	account transactions do:[:aTransaction | 
-		(aTransaction isKindOf: Deposit) ifTrue:[
-		transactionStringCollection add: ('Deposito por ', (aTransaction value asString))
-			].
-		(aTransaction isKindOf: Withdraw) ifTrue:[
-		transactionStringCollection add: ('Extraccion por ', (aTransaction value asString))
-			].
-		(aTransaction isKindOf: TransferWithdrawLeg) ifTrue:[
-		transactionStringCollection add: ('Salida por transferencia de ', (aTransaction value asString))
-			].
-		(aTransaction isKindOf: TransferDepositLeg) ifTrue:[
-		transactionStringCollection add: ('Entrada por transferencia de ', (aTransaction value asString))
-			].
-		].
-	
-	^transactionStringCollection.! !
-
-!AccountSummary methodsFor: 'as yet unclassified' stamp: 'MP 11/13/2022 21:30:22'!
-initializeFor: anAccount
-
-	account := anAccount.! !
-
-!AccountSummary methodsFor: 'as yet unclassified' stamp: 'MP 11/13/2022 21:51:38'!
-report
-	|reportStringCollection|
-
-	reportStringCollection := self addTransactionMessages.
-
-	reportStringCollection add: ('Balance = ', (account balance asString)).
-
-	^reportStringCollection.
-	
-	"la coleccion, se crea acá, en el addTransactions, o se usa como variable de instancia?"! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'AccountSummary class' category: 'ServiciosFinancieros-Solucion'!
-AccountSummary class
-	instanceVariableNames: ''!
-
-!AccountSummary class methodsFor: 'as yet unclassified' stamp: 'MP 11/13/2022 21:29:58'!
-for: anAccount
-
-	^self new initializeFor: anAccount.! !
+	transactions do: [:aTransaction| aTransaction accept: aTransactionVisitor ]! !
 
 
 !classDefinition: #AccountTransaction category: 'ServiciosFinancieros-Solucion'!
@@ -951,6 +886,12 @@ value
 affectBalance: aBalance
 
 	^aBalance + value ! !
+
+
+!Deposit methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 16:06:07'!
+accept: aTransactionVisitor
+	
+	aTransactionVisitor visitDeposit: self.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1040,6 +981,12 @@ affectBalance: aBalance
 
 	^aBalance + self value! !
 
+
+!TransferDepositLeg methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 16:15:34'!
+accept: aTransactionVisitor
+	
+	aTransactionVisitor visitTransferDeposit: self.! !
+
 
 !classDefinition: #TransferWithdrawLeg category: 'ServiciosFinancieros-Solucion'!
 TransferLeg subclass: #TransferWithdrawLeg
@@ -1064,6 +1011,12 @@ affectBalance: aBalance
 affectTransferNet: aTransferNet
 
 	^aTransferNet - self value! !
+
+
+!TransferWithdrawLeg methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 16:21:27'!
+accept: aTransactionVisitor
+	
+	aTransactionVisitor visitTransferWithdraw: self.! !
 
 
 !classDefinition: #Withdraw category: 'ServiciosFinancieros-Solucion'!
@@ -1090,6 +1043,12 @@ affectBalance: aBalance
 
 	^aBalance - value! !
 
+
+!Withdraw methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 16:22:33'!
+accept: aTransactionVisitor
+	
+	aTransactionVisitor visitWithdraw: self.! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Withdraw class' category: 'ServiciosFinancieros-Solucion'!
@@ -1111,6 +1070,136 @@ register: aValue on: account
 	account register: transaction.
 		
 	^ transaction! !
+
+
+!classDefinition: #TransactionsVisitor category: 'ServiciosFinancieros-Solucion'!
+Object subclass: #TransactionsVisitor
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Solucion'!
+
+!TransactionsVisitor methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 16:43:34'!
+visitDeposit: aDeposit
+	
+	self subclassResponsibility. ! !
+
+!TransactionsVisitor methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 17:04:57'!
+visitTransferDeposit: aTransferDeposit
+	
+	self subclassResponsibility.! !
+
+!TransactionsVisitor methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 17:05:12'!
+visitTransferWithdraw: aTransferWithdraw
+	
+	self subclassResponsibility.! !
+
+!TransactionsVisitor methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 17:05:26'!
+visitWithdraw: aWithdraw
+	
+	self subclassResponsibility.! !
+
+
+!classDefinition: #AccountSummary category: 'ServiciosFinancieros-Solucion'!
+TransactionsVisitor subclass: #AccountSummary
+	instanceVariableNames: 'account reportStringCollection'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Solucion'!
+
+!AccountSummary methodsFor: 'as yet unclassified' stamp: 'MP 11/13/2022 21:30:22'!
+initializeFor: anAccount
+
+	account := anAccount.! !
+
+!AccountSummary methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 16:10:05'!
+report
+	
+	reportStringCollection := OrderedCollection new.
+	
+	account visitTransactionsWith: self.
+	
+	reportStringCollection add: ('Balance = ', (account balance asString)).
+
+	^reportStringCollection.
+	! !
+
+!AccountSummary methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 16:37:45'!
+visitDeposit: aDeposit
+	
+	reportStringCollection add: ('Deposito por ', (aDeposit value asString))	! !
+
+!AccountSummary methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 16:16:41'!
+visitTransferDeposit: aTransferDeposit
+	reportStringCollection add: ('Entrada por transferencia de ', (aTransferDeposit value asString))	! !
+
+!AccountSummary methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 16:19:02'!
+visitTransferWithdraw: aTransferWithdraw
+	reportStringCollection add: ('Salida por transferencia de ', (aTransferWithdraw value asString))	! !
+
+!AccountSummary methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 16:19:17'!
+visitWithdraw: aWithdraw
+	reportStringCollection add: ('Extraccion por ', (aWithdraw value asString))	! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'AccountSummary class' category: 'ServiciosFinancieros-Solucion'!
+AccountSummary class
+	instanceVariableNames: ''!
+
+!AccountSummary class methodsFor: 'as yet unclassified' stamp: 'MP 11/13/2022 21:29:58'!
+for: anAccount
+
+	^self new initializeFor: anAccount.! !
+
+
+!classDefinition: #TransferNet category: 'ServiciosFinancieros-Solucion'!
+TransactionsVisitor subclass: #TransferNet
+	instanceVariableNames: 'account transferNetValue'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Solucion'!
+
+!TransferNet methodsFor: 'as yet unclassified' stamp: 'MP 11/15/2022 18:22:53'!
+initializeFor: anAccount
+
+	account := anAccount.! !
+
+!TransferNet methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 16:36:36'!
+value
+	
+	transferNetValue := 0.
+	
+	account visitTransactionsWith: self.
+	
+	^transferNetValue.! !
+
+!TransferNet methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 16:38:51'!
+visitDeposit: aDeposit! !
+
+!TransferNet methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 16:40:24'!
+visitTransferDeposit: aTransferDeposit
+	
+	transferNetValue := transferNetValue + aTransferDeposit value.! !
+
+!TransferNet methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 16:39:50'!
+visitTransferWithdraw: aTransferWithdraw
+	
+	transferNetValue := transferNetValue - aTransferWithdraw value.! !
+
+!TransferNet methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 16:39:11'!
+visitWithdraw: aWithdraw! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'TransferNet class' category: 'ServiciosFinancieros-Solucion'!
+TransferNet class
+	instanceVariableNames: ''!
+
+!TransferNet class methodsFor: 'as yet unclassified' stamp: 'MP 11/15/2022 18:22:25'!
+for: anAccount
+
+	^self new initializeFor: anAccount.! !
 
 
 !classDefinition: #Transfer category: 'ServiciosFinancieros-Solucion'!
@@ -1204,34 +1293,3 @@ amount: anAmountOfMoney from: originAccount to: destinationAccount
 	
 	
 	! !
-
-
-!classDefinition: #TransferNet category: 'ServiciosFinancieros-Solucion'!
-Object subclass: #TransferNet
-	instanceVariableNames: 'account'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'ServiciosFinancieros-Solucion'!
-
-!TransferNet methodsFor: 'as yet unclassified' stamp: 'MP 11/15/2022 18:22:53'!
-initializeFor: anAccount
-
-	account := anAccount.! !
-
-!TransferNet methodsFor: 'as yet unclassified' stamp: 'MP 11/15/2022 18:41:26'!
-value
-
-	^account transactions 
-		inject: 0*peso
-		into: [ :currentTransferNet :transaction | transaction affectTransferNet: currentTransferNet].! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'TransferNet class' category: 'ServiciosFinancieros-Solucion'!
-TransferNet class
-	instanceVariableNames: ''!
-
-!TransferNet class methodsFor: 'as yet unclassified' stamp: 'MP 11/15/2022 18:22:25'!
-for: anAccount
-
-	^self new initializeFor: anAccount.! !
