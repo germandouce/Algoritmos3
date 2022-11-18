@@ -5,12 +5,12 @@ TestCase subclass: #AccountSummaryTest
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
 
-!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 17:41:38'!
+!AccountSummaryTest methodsFor: 'tests' stamp: 'gd 11/17/2022 17:41:38'!
 test01AcountSummaryForAnAccountWithNoTransactionsOnlyShowsZeroBlanceStringMessage
 	
 	self assert: ((AccountSummary for: ReceptiveAccount new) report includes:  'Balance = 0 * pesos').! !
 
-!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 17:21:03'!
+!AccountSummaryTest methodsFor: 'tests' stamp: 'gd 11/17/2022 17:21:03'!
 test02AccountSummaryContainsDepositStringMessage
 	|anAccount report |
 	
@@ -23,7 +23,7 @@ test02AccountSummaryContainsDepositStringMessage
 	self assert: report includes: 'Deposito por 100 * pesos'.
 	self assert: (report last) equals: 'Balance = 100 * pesos'.! !
 
-!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 17:20:36'!
+!AccountSummaryTest methodsFor: 'tests' stamp: 'gd 11/17/2022 17:20:36'!
 test03AccountSummaryContainsWithdrawStringMessage
 	|anAccount report|
 	
@@ -35,7 +35,7 @@ test03AccountSummaryContainsWithdrawStringMessage
 	self assert: report includes: 'Extraccion por 100 * pesos'.
 	self assert: (report last) equals: 'Balance = -100 * pesos'.! !
 
-!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 17:57:56'!
+!AccountSummaryTest methodsFor: 'tests' stamp: 'gd 11/17/2022 17:57:56'!
 test04AccountSummaryContainsTransferWithdrawStringMessage
 	|originAccount destinationAccount report|
 	
@@ -48,7 +48,7 @@ test04AccountSummaryContainsTransferWithdrawStringMessage
 	self assert: report includes: 'Salida por transferencia de 100 * pesos'.
 	self assert: (report last) equals: 'Balance = -100 * pesos'.! !
 
-!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 17:25:05'!
+!AccountSummaryTest methodsFor: 'tests' stamp: 'gd 11/17/2022 17:25:05'!
 test05AccountSummaryContainsTransferDepositStringMessage
 	|originAccount destinationAccount report|
 	
@@ -61,7 +61,7 @@ test05AccountSummaryContainsTransferDepositStringMessage
 	self assert: report includes: 'Entrada por transferencia de 100 * pesos'.
 	self assert: (report last) equals: 'Balance = 100 * pesos'.! !
 
-!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 17:28:48'!
+!AccountSummaryTest methodsFor: 'tests' stamp: 'gd 11/17/2022 17:28:48'!
 test06AccountSummaryContainsAllTransferStringMessages
 	|originAccount destinationAccount report|
 	
@@ -77,7 +77,7 @@ test06AccountSummaryContainsAllTransferStringMessages
 	self assert: report includes: 'Deposito por 60 * pesos'.
 	self assert: (report last) equals: 'Balance = 10 * pesos'.! !
 
-!AccountSummaryTest methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 17:36:49'!
+!AccountSummaryTest methodsFor: 'tests' stamp: 'gd 11/17/2022 17:36:49'!
 test07PortfolioBehavesAsAccountForAccountSummary
 	|originAccount destinationAccount report aPortfolio|
 	
@@ -317,8 +317,8 @@ TestCase subclass: #PortfolioTreePrinterTest
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
 
-!PortfolioTreePrinterTest methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 20:59:47'!
-test01
+!PortfolioTreePrinterTest methodsFor: 'tests' stamp: 'MP 11/18/2022 15:18:22'!
+test01PortfolioTreePrinterForAnEmptyPortfolioReturnsOnlyThePortfolioName
 	
 	|printedLines|
 	
@@ -326,6 +326,37 @@ test01
 	
 	self assert: (printedLines includes: 'Portfolio de la familia').
 	! !
+
+!PortfolioTreePrinterTest methodsFor: 'tests' stamp: 'MP 11/18/2022 15:22:57'!
+test02PortfolioTreePrinterForAPortfolioWithOneAccountReturnsTheAccountNameWithRightIndentation
+	
+	|printedLines aPortfolio johnsAccount|
+	
+	johnsAccount := ReceptiveAccount named: 'Cuenta de Juan'. 
+	aPortfolio := Portfolio named: 'Portfolio de la familia' with: johnsAccount.	
+	printedLines := ( PortfolioTreePrinter for: aPortfolio) printReport.
+
+	self assert: printedLines first equals: 'Portfolio de la familia'.
+	self assert: printedLines includes: '   Cuenta de Juan'.
+	self assert: printedLines size equals: 2.	! !
+
+!PortfolioTreePrinterTest methodsFor: 'tests' stamp: 'MP 11/18/2022 15:26:24'!
+test03AfterPrintingASubportfolioIndentationIsDecremented
+	
+	|printedLines childsPortfolio aPortfolio myAccount|
+	
+	childsPortfolio := Portfolio named: 'Portfolio de hijos' with: (ReceptiveAccount named: 'Cuenta de Juan').
+	myAccount := ReceptiveAccount named: 'Cuenta mia'.
+	aPortfolio := Portfolio named: 'Portfolio de la familia' with: myAccount with: childsPortfolio.
+	aPortfolio add: (ReceptiveAccount named: 'Cuenta de Angeles').
+	printedLines := ( PortfolioTreePrinter for: aPortfolio) printReport.
+
+	self assert: printedLines first equals: 'Portfolio de la familia'.
+	self assert: printedLines second equals: '   Cuenta mia'.
+	self assert: printedLines third equals: '   Portfolio de hijos'.	
+	self assert: printedLines fourth equals: '      Cuenta de Juan'.	
+	self assert: printedLines fifth equals: '   Cuenta de Angeles'.		
+	self assert: printedLines size equals: 5.	! !
 
 
 !classDefinition: #ReceptiveAccountTest category: 'ServiciosFinancieros-Solucion'!
@@ -426,12 +457,12 @@ TestCase subclass: #TransferNetTest
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
 
-!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 17:40:34'!
+!TransferNetTest methodsFor: 'tests' stamp: 'gd 11/17/2022 17:40:34'!
 test01TransferNetValueForAccountWithNoTransfersIsZero
 
 	self assert: (TransferNet for: ReceptiveAccount new) value equals: 0.! !
 
-!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 18:06:45'!
+!TransferNetTest methodsFor: 'tests' stamp: 'gd 11/17/2022 18:06:45'!
 test02TransferNetValueForAnAccountWithADepositIsZero
 	|anAccount|
 	
@@ -440,7 +471,7 @@ test02TransferNetValueForAnAccountWithADepositIsZero
 	
 	self assert: (TransferNet for: anAccount) value equals: 0.! !
 
-!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 18:06:52'!
+!TransferNetTest methodsFor: 'tests' stamp: 'gd 11/17/2022 18:06:52'!
 test03TransferNetValueForAnAccountWithAWithdrawIsZero
 	|anAccount|
 	
@@ -449,7 +480,7 @@ test03TransferNetValueForAnAccountWithAWithdrawIsZero
 	
 	self assert: (TransferNet for: anAccount) value equals: 0.! !
 
-!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 18:09:14'!
+!TransferNetTest methodsFor: 'tests' stamp: 'gd 11/17/2022 18:09:14'!
 test04TransferNetValueForAnAccountWithATransferWithdrawEqualsTransfersValue
 	
 	|anAccount anotherAccount|
@@ -460,7 +491,7 @@ test04TransferNetValueForAnAccountWithATransferWithdrawEqualsTransfersValue
 	
 	self assert: (TransferNet for: anAccount) value equals: -100.! !
 
-!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 18:08:56'!
+!TransferNetTest methodsFor: 'tests' stamp: 'gd 11/17/2022 18:08:56'!
 test05TransferNetValueForAnAccountWithATransferDepositEqualsTransfersValue
 	
 	|anAccount anotherAccount|
@@ -471,7 +502,7 @@ test05TransferNetValueForAnAccountWithATransferDepositEqualsTransfersValue
 	
 	self assert: (TransferNet for: anAccount) value equals: 100.! !
 
-!TransferNetTest methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 18:07:37'!
+!TransferNetTest methodsFor: 'tests' stamp: 'gd 11/17/2022 18:07:37'!
 test06WhenTransferingBetweenTwoAccountsInSamePortfolioThePortfolioTransferNetValueIsZero
 
 	|anAccount aPortfolio anotherAccount |
@@ -492,7 +523,7 @@ TestCase subclass: #TransferTest
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
 
-!TransferTest methodsFor: 'as yet unclassified' stamp: 'LL 9/20/2020 21:07:03'!
+!TransferTest methodsFor: 'tests' stamp: 'LL 9/20/2020 21:07:03'!
 test01ATransferDecreasesBalanceFromOriginAccountAndIncreasesItForDestinationAccount
 
 	| destinationAccount originAccount |
@@ -508,7 +539,7 @@ test01ATransferDecreasesBalanceFromOriginAccountAndIncreasesItForDestinationAcco
 	self assert: 8 * peso equals: originAccount balance.
 	self assert: 12 * peso equals: destinationAccount balance.! !
 
-!TransferTest methodsFor: 'as yet unclassified' stamp: 'LL 9/20/2020 21:12:28'!
+!TransferTest methodsFor: 'tests' stamp: 'LL 9/20/2020 21:12:28'!
 test02ATransferKnowsItsValue
 
 	| destinationAccount originAccount transfer |
@@ -523,7 +554,7 @@ test02ATransferKnowsItsValue
 	
 	self assert: 2 * peso equals: transfer value.! !
 
-!TransferTest methodsFor: 'as yet unclassified' stamp: 'LL 9/20/2020 23:01:44'!
+!TransferTest methodsFor: 'tests' stamp: 'LL 9/20/2020 23:01:44'!
 test03DepositLegKnowsItsWithdrawCounterpart
 
 	| destinationAccount originAccount transfer |
@@ -538,7 +569,7 @@ test03DepositLegKnowsItsWithdrawCounterpart
 	
 	self assert: transfer withdrawLeg equals: transfer depositLeg withdrawLeg! !
 
-!TransferTest methodsFor: 'as yet unclassified' stamp: 'LL 9/20/2020 23:01:51'!
+!TransferTest methodsFor: 'tests' stamp: 'LL 9/20/2020 23:01:51'!
 test04WithdrawLegKnowsItsDepositCounterpart
 
 	| destinationAccount originAccount transfer |
@@ -553,7 +584,7 @@ test04WithdrawLegKnowsItsDepositCounterpart
 	
 	self assert: transfer depositLeg equals: transfer withdrawLeg depositLeg! !
 
-!TransferTest methodsFor: 'as yet unclassified' stamp: 'LL 9/20/2020 23:02:36'!
+!TransferTest methodsFor: 'tests' stamp: 'LL 9/20/2020 23:02:36'!
 test05OriginAndDestinationAccountsCannotBeTheSame
 
 	| originAccount |
@@ -569,7 +600,7 @@ test05OriginAndDestinationAccountsCannotBeTheSame
 		]
 ! !
 
-!TransferTest methodsFor: 'as yet unclassified' stamp: 'LL 9/20/2020 23:02:44'!
+!TransferTest methodsFor: 'tests' stamp: 'LL 9/20/2020 23:02:44'!
 test06CannotTransferAZeroAmount
 
 	| originAccount destinationAccount |
@@ -634,6 +665,12 @@ initializeWith: aName
 	
 	name := aName.
 	! !
+
+
+!Account methodsFor: 'as yet unclassified' stamp: 'MP 11/18/2022 14:29:25'!
+name
+
+	^name! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -759,6 +796,21 @@ signalCanNotAddAccount
 	self error: self class canNotAddAccountErrorMessage! !
 
 
+!Portfolio methodsFor: 'as yet unclassified' stamp: 'MP 11/18/2022 14:21:25'!
+accept: anAccountVisitor
+
+	anAccountVisitor visitPortfolio: self.! !
+
+!Portfolio methodsFor: 'as yet unclassified' stamp: 'MP 11/18/2022 13:59:47'!
+addAccountNames
+
+	^accounts ! !
+
+!Portfolio methodsFor: 'as yet unclassified' stamp: 'MP 11/18/2022 14:19:11'!
+visitAccountsWith: anAccountVisitor
+	
+	accounts do: [:anAccount| anAccount accept: anAccountVisitor].! !
+
 !Portfolio methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 16:25:26'!
 visitTransactionsWith: aTransactionVisitor
 	
@@ -780,6 +832,14 @@ named: aName with: anAccount
 
 	^(self named: aName) 
 		add: anAccount;
+		yourself! !
+
+!Portfolio class methodsFor: 'as yet unclassified' stamp: 'MP 11/18/2022 14:39:59'!
+named: aName with: anAccount with: anotherAccount
+
+	^(self named: aName) 
+		add: anAccount;
+		add: anotherAccount;
 		yourself! !
 
 !Portfolio class methodsFor: 'as yet unclassified' stamp: 'HAW 5/25/2019 11:18:21'!
@@ -853,6 +913,11 @@ isComposedBy: anAccount
 
 	^self = anAccount ! !
 
+
+!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'MP 11/18/2022 14:22:09'!
+accept: anAccountVisitor
+
+	anAccountVisitor visitAccount: self.! !
 
 !ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'MP 11/13/2022 20:56:02'!
 addTransactionMessages
@@ -1117,41 +1182,6 @@ register: aValue on: account
 	^ transaction! !
 
 
-!classDefinition: #PortfolioTreePrinter category: 'ServiciosFinancieros-Solucion'!
-Object subclass: #PortfolioTreePrinter
-	instanceVariableNames: 'portfolio linesToPrint'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'ServiciosFinancieros-Solucion'!
-
-!PortfolioTreePrinter methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 20:55:02'!
-initializeFor: aPortfolio
-	
-	portfolio := aPortfolio.
-	! !
-
-!PortfolioTreePrinter methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 21:07:14'!
-printReport
-		
-	linesToPrint := OrderedCollection new.
-	
-	linesToPrint add: 'Portfolio de la familia'.
-	
-	^linesToPrint
-	! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'PortfolioTreePrinter class' category: 'ServiciosFinancieros-Solucion'!
-PortfolioTreePrinter class
-	instanceVariableNames: ''!
-
-!PortfolioTreePrinter class methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 20:53:57'!
-for: aPortfolio
-	
-	^self new initializeFor: aPortfolio.! !
-
-
 !classDefinition: #TransactionsVisitor category: 'ServiciosFinancieros-Solucion'!
 Object subclass: #TransactionsVisitor
 	instanceVariableNames: ''
@@ -1373,3 +1403,82 @@ amount: anAmountOfMoney from: originAccount to: destinationAccount
 	
 	
 	! !
+
+
+!classDefinition: #XXXVisitor category: 'ServiciosFinancieros-Solucion'!
+Object subclass: #XXXVisitor
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Solucion'!
+
+
+!classDefinition: #PortfolioTreePrinter category: 'ServiciosFinancieros-Solucion'!
+XXXVisitor subclass: #PortfolioTreePrinter
+	instanceVariableNames: 'portfolio linesToPrint indentation'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Solucion'!
+
+!PortfolioTreePrinter methodsFor: 'visitor' stamp: 'MP 11/18/2022 14:22:47'!
+visitAccount: anAccount
+
+	self addNameOf: anAccount.! !
+
+!PortfolioTreePrinter methodsFor: 'visitor' stamp: 'MP 11/18/2022 15:09:51'!
+visitPortfolio: aPortfolio
+
+	self addNameOf: aPortfolio.
+	
+	self increaseIndentationThreeSpaces.
+	
+	aPortfolio visitAccountsWith: self.
+	
+	self decreaseIndentationThreeSpaces.! !
+
+
+!PortfolioTreePrinter methodsFor: 'initialization' stamp: 'MP 11/18/2022 14:24:20'!
+initializeFor: aPortfolio
+	
+	portfolio := aPortfolio.
+	! !
+
+
+!PortfolioTreePrinter methodsFor: 'functionality' stamp: 'MP 11/18/2022 15:07:06'!
+printReport
+		
+	linesToPrint := OrderedCollection new.
+	indentation  := ''.
+	
+	portfolio accept: self.
+	
+	^linesToPrint
+	! !
+
+
+!PortfolioTreePrinter methodsFor: 'private' stamp: 'MP 11/18/2022 15:07:13'!
+addNameOf: anAccount
+	
+	linesToPrint add: indentation,anAccount name
+	! !
+
+!PortfolioTreePrinter methodsFor: 'private' stamp: 'MP 11/18/2022 15:09:51'!
+decreaseIndentationThreeSpaces
+
+	^ indentation := indentation allButLast: 3! !
+
+!PortfolioTreePrinter methodsFor: 'private' stamp: 'MP 11/18/2022 15:09:21'!
+increaseIndentationThreeSpaces
+
+	^ indentation := indentation,'   '! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'PortfolioTreePrinter class' category: 'ServiciosFinancieros-Solucion'!
+PortfolioTreePrinter class
+	instanceVariableNames: ''!
+
+!PortfolioTreePrinter class methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 20:53:57'!
+for: aPortfolio
+	
+	^self new initializeFor: aPortfolio.! !
