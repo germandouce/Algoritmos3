@@ -310,6 +310,24 @@ test15PortfolioCanNotIncludeAnyOfTheComposedAccountOfPortfolioToAdd
 			self assert: portfolioToModify accountsIsEmpty ]! !
 
 
+!classDefinition: #PortfolioTreePrinterTest category: 'ServiciosFinancieros-Solucion'!
+TestCase subclass: #PortfolioTreePrinterTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Solucion'!
+
+!PortfolioTreePrinterTest methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 20:59:47'!
+test01
+	
+	|printedLines|
+	
+	printedLines := ( PortfolioTreePrinter for: (Portfolio named: 'Portfolio de la familia') ) printReport.
+	
+	self assert: (printedLines includes: 'Portfolio de la familia').
+	! !
+
+
 !classDefinition: #ReceptiveAccountTest category: 'ServiciosFinancieros-Solucion'!
 TestCase subclass: #ReceptiveAccountTest
 	instanceVariableNames: ''
@@ -573,7 +591,7 @@ test06CannotTransferAZeroAmount
 
 !classDefinition: #Account category: 'ServiciosFinancieros-Solucion'!
 Object subclass: #Account
-	instanceVariableNames: ''
+	instanceVariableNames: 'name'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
@@ -609,6 +627,26 @@ isComposedBy: anAccount
 addTransactionsTo: aCollectionOfTransactions
 
 	self subclassResponsibility ! !
+
+
+!Account methodsFor: 'initialization' stamp: 'gd 11/17/2022 20:44:51'!
+initializeWith: aName
+	
+	name := aName.
+	! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Account class' category: 'ServiciosFinancieros-Solucion'!
+Account class
+	instanceVariableNames: ''!
+
+!Account class methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 20:43:00'!
+named: aName
+
+	^self new initializeWith: aName.
+
+	! !
 
 
 !classDefinition: #Portfolio category: 'ServiciosFinancieros-Solucion'!
@@ -736,6 +774,13 @@ Portfolio class
 canNotAddAccountErrorMessage
 	
 	^'Can not add repeated account to a portfolio'! !
+
+!Portfolio class methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 20:37:05'!
+named: aName with: anAccount
+
+	^(self named: aName) 
+		add: anAccount;
+		yourself! !
 
 !Portfolio class methodsFor: 'as yet unclassified' stamp: 'HAW 5/25/2019 11:18:21'!
 with: anAccount
@@ -1070,6 +1115,41 @@ register: aValue on: account
 	account register: transaction.
 		
 	^ transaction! !
+
+
+!classDefinition: #PortfolioTreePrinter category: 'ServiciosFinancieros-Solucion'!
+Object subclass: #PortfolioTreePrinter
+	instanceVariableNames: 'portfolio linesToPrint'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Solucion'!
+
+!PortfolioTreePrinter methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 20:55:02'!
+initializeFor: aPortfolio
+	
+	portfolio := aPortfolio.
+	! !
+
+!PortfolioTreePrinter methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 21:07:14'!
+printReport
+		
+	linesToPrint := OrderedCollection new.
+	
+	linesToPrint add: 'Portfolio de la familia'.
+	
+	^linesToPrint
+	! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'PortfolioTreePrinter class' category: 'ServiciosFinancieros-Solucion'!
+PortfolioTreePrinter class
+	instanceVariableNames: ''!
+
+!PortfolioTreePrinter class methodsFor: 'as yet unclassified' stamp: 'gd 11/17/2022 20:53:57'!
+for: aPortfolio
+	
+	^self new initializeFor: aPortfolio.! !
 
 
 !classDefinition: #TransactionsVisitor category: 'ServiciosFinancieros-Solucion'!
